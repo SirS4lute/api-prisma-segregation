@@ -181,7 +181,6 @@ The mapper layer (`product.mapper.ts` and `category.mapper.ts`) helps maintain t
 ```
 
 In `main.ts`, we check the `DATABASE_ORM` variable and dynamically initialize the correct ORM:
-
 ```bash
 if (process.env.DATABASE_ORM == 'typeOrm') {
   // Inicializa o banco de dados typeORM
@@ -190,7 +189,6 @@ if (process.env.DATABASE_ORM == 'typeOrm') {
 ```
 
 In `products.module.ts`, we exemplify how the choice of ORM is injected into the service, using an interface to maintain decoupling:
-
 ```bash
 providers: [
     ProductsService, 
@@ -202,6 +200,8 @@ providers: [
   ],
 ```
 
+---
+
 ## 📌 Final Considerations
 This project was structured to be scalable, modular, and flexible, applying essential SOLID concepts to ensure a robust architecture.
 - Prisma and TypeORM are completely decoupled from the core application.
@@ -210,6 +210,8 @@ This project was structured to be scalable, modular, and flexible, applying esse
 - The architecture facilitates application evolution, allowing new ORMs to be added in the future without rewriting the entire business logic.
 
 If you have any questions or suggestions, feel free to contribute! 🚀
+
+---
 
 # API de Produtos - NestJS [PT-BR]
 
@@ -315,13 +317,13 @@ http://localhost:3000/api/docs
 Nosso objetivo é montar uma arquitetura desacoplada entre os modelos de negócio e os modelos de banco de dados. Para isso, utilizamos uma camada adicional de abstração, garantindo a segregação entre o domínio da aplicação e a persistência dos dados. Essa estratégia se baseia no conceito do SOLID conhecido como Interface Segregation Principle (ISP). Alguns conceitos abordados aqui podem ser melhor ilustrados em: [SOLID-Principles](https://github.com/SirS4lute/SOLID-Principles).
 
 ## 🔍 Aplicação do Interface Segregation Principle (ISP)
-A estrutura do projeto garante que nossos módulos, controllers e services não dependam diretamente de um ORM específico. Isso é feito através da criação de interfaces de repositórios dentro de src/modules/{modulo}/interfaces/, definindo um contrato que qualquer implementação de repositório (seja Prisma ou TypeORM) deve seguir.
+A estrutura do projeto garante que nossos módulos, controllers e services não dependam diretamente de um ORM específico. Isso é feito através da criação de interfaces de repositórios dentro de `src/modules/{modulo}/interfaces/`, definindo um contrato que qualquer implementação de repositório (seja Prisma ou TypeORM) deve seguir.
 
 Exemplo prático:
+- A interface `products-repository.interface.ts` dentro de `src/modules/products/interfaces/` define as operações que um repositório de produtos deve ter.
+- O serviço `products.service.ts` não sabe qual ORM está sendo utilizado, pois ele depende apenas da interface.
+- No momento da injeção de dependência, o repositório Prisma ou TypeORM é instanciado dinamicamente, baseado na configuração do `.env`.
 
-- A interface products-repository.interface.ts dentro de src/modules/products/interfaces/ define as operações que um repositório de produtos deve ter.
-- O serviço products.service.ts não sabe qual ORM está sendo utilizado, pois ele depende apenas da interface.
-- No momento da injeção de dependência, o repositório Prisma ou TypeORM é instanciado dinamicamente, baseado na configuração do .env.
 Essa abordagem nos permite alternar entre os ORMs sem afetar a regra de negócio, tornando a aplicação mais flexível e desacoplada.
 
 ## 📌 Outros Princípios do SOLID Aplicados
@@ -329,12 +331,11 @@ Essa abordagem nos permite alternar entre os ORMs sem afetar a regra de negócio
 O DIP preconiza que módulos de alto nível não devem depender de módulos de baixo nível diretamente, mas sim de abstrações.
 
 Como aplicamos esse conceito?
-
-- O products.service.ts e o categories.service.ts não dependem diretamente de Prisma ou TypeORM.
-- Em vez disso, eles dependem de uma interface (products-repository.interface.ts e categories-repository.interface.ts).
+- O `products.service.ts` e o `categories.service.ts` não dependem diretamente de Prisma ou TypeORM.
+- Em vez disso, eles dependem de uma interface (`products-repository.interface.ts` e `categories-repository.interface.ts`).
 - Isso significa que se quisermos adicionar um novo ORM no futuro (como Sequelize), basta criar uma nova implementação que siga a interface existente, sem alterar os serviços.
-Isso se reflete na estrutura do diretório:
 
+Isso se reflete na estrutura do diretório:
 ```bash
 │   ├── modules/
 │   │   ├── products/
@@ -345,17 +346,17 @@ Isso se reflete na estrutura do diretório:
 
 ## 2️⃣ Single Responsibility Principle (SRP)
 Cada classe ou módulo tem uma única responsabilidade.
-Como aplicamos isso?
 
-- Os repositórios (products.repository.ts, categories.repository.ts) apenas lidam com a persistência de dados.
-- Os serviços (products.service.ts, categories.service.ts) apenas contêm regras de negócio e lógica de aplicação.
-- Os controladores (products.controller.ts, categories.controller.ts) são responsáveis apenas por receber requisições e chamar os serviços apropriados.
+Como aplicamos isso?
+- Os repositórios (`products.repository.ts`, `categories.repository.ts`) apenas lidam com a persistência de dados.
+- Os serviços (`products.service.ts`, `categories.service.ts`) apenas contêm regras de negócio e lógica de aplicação.
+- Os controladores (`products.controller.ts`, `categories.controller.ts`) são responsáveis apenas por receber requisições e chamar os serviços apropriados.
+
 Essa separação de responsabilidades torna a aplicação mais organizada e fácil de manter.
 
 ## 📌 Como a Estrutura do Diretório Reflete Esses Princípios
 ### 1️⃣ Separação de Módulos (SRP)
 Cada funcionalidade tem seu próprio módulo, garantindo coesão e modularidade:
-
 ```bash
 │   ├── modules/
 │   │   ├── products/
@@ -369,7 +370,6 @@ Cada funcionalidade tem seu próprio módulo, garantindo coesão e modularidade:
 
 ### 2️⃣ Camada de Abstração para Repositórios (DIP e ISP)
 Criamos uma camada adicional para os ORMs, isolando-os do core da aplicação.
-
 ```bash
 │   ├── repositories/
 │   │   ├── prisma/                   # Implementação do Prisma
@@ -388,9 +388,7 @@ Criamos uma camada adicional para os ORMs, isolando-os do core da aplicação.
 
 ### 3️⃣ Configuração do ORM Dinâmico
 A inicialização do ORM acontece de acordo com a configuração do .env, garantindo flexibilidade.
-
-A camada de mappers (product.mapper.ts e category.mapper.ts) ajuda a manter a separação entre as entidades do banco e os modelos de negócio, seguindo o SRP.
-
+A camada de mappers (`product.mapper.ts` e `category.mapper.ts`) ajuda a manter a separação entre as entidades do banco e os modelos de negócio, seguindo o SRP.
 ```bash
 │── .env                 # Define qual ORM será utilizado
 │── typeOrm/
@@ -398,7 +396,6 @@ A camada de mappers (product.mapper.ts e category.mapper.ts) ajuda a manter a se
 ```
 
 No `main.ts`, verificamos a variável `DATABASE_ORM` e inicializamos dinamicamente o ORM correto:
-
 ```bash
 if (process.env.DATABASE_ORM == 'typeOrm') {
   // Inicializa o banco de dados typeORM
@@ -407,7 +404,6 @@ if (process.env.DATABASE_ORM == 'typeOrm') {
 ```
 
 No `products.module.ts` exemplificamos como é feita a escolha de qual ORM será injetado na service, utilizando a interface para manter o desacoplamento
-
 ```bash
 providers: [
     ProductsService, 
@@ -419,7 +415,21 @@ providers: [
   ],
 ```
 
-## Estrutura de diretórios completa
+---
+
+## 📌 Considerações Finais
+Este projeto foi estruturado para ser escalável, modular e flexível, aplicando conceitos essenciais do SOLID para garantir uma arquitetura robusta.
+
+- Prisma e TypeORM estão completamente desacoplados do core da aplicação.
+- A troca de ORM é feita apenas editando o arquivo `.env`.
+- Os serviços e controladores não são afetados pela escolha do ORM.
+- A arquitetura facilita a evolução da aplicação, permitindo adicionar novos ORMs futuramente sem reescrever toda a lógica de negócio.
+
+Caso tenha dúvidas ou sugestões, sinta-se à vontade para contribuir! 🚀
+
+---
+
+## Estrutura de diretórios completa / Full directories structrure
 
 ```bash
 api-prisma-segregation/
@@ -470,13 +480,3 @@ api-prisma-segregation/
 │── tsconfig.json                                    # Configuração do TypeScript
 ...
 ```
-
-## 📌 Considerações Finais
-Este projeto foi estruturado para ser escalável, modular e flexível, aplicando conceitos essenciais do SOLID para garantir uma arquitetura robusta.
-
-- Prisma e TypeORM estão completamente desacoplados do core da aplicação.
-- A troca de ORM é feita apenas editando o arquivo .env.
-- Os serviços e controladores não são afetados pela escolha do ORM.
-- A arquitetura facilita a evolução da aplicação, permitindo adicionar novos ORMs futuramente sem reescrever toda a lógica de negócio.
-
-Caso tenha dúvidas ou sugestões, sinta-se à vontade para contribuir! 🚀
