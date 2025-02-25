@@ -1,8 +1,8 @@
 import { Repository } from 'typeorm';
-import { Product } from 'src/core/models/product.model'; // Entidade de domínio
-import { ProductEntity } from './product.entity'; // Entidade do TypeORM
-import { ProductMapper } from './product.mapper'; // Mapper
-import { AppDataSource } from 'typeOrm/data-source'; // DataSource do TypeORM
+import { Product } from 'src/core/models/product.model';
+import { ProductEntity } from './product.entity';
+import { ProductMapper } from './product.mapper';
+import { AppDataSource } from 'typeOrm/data-source';
 import { ProductsRepository } from 'src/modules/products/interfaces/products-repository.interface';
 
 export class TypeORMProductsRepository implements ProductsRepository {
@@ -16,9 +16,9 @@ export class TypeORMProductsRepository implements ProductsRepository {
      * Cria um novo produto no banco de dados.
      */
     async create(product: Product): Promise<Product> {
-        const productEntity = ProductMapper.toEntity(product); // Converte para TypeORM
-        const savedEntity = await this.repository.save(productEntity); // Salva no banco
-        return ProductMapper.toDomain(savedEntity); // Converte de volta para domínio
+        const productEntity = ProductMapper.toEntity(product);
+        const savedEntity = await this.repository.save(productEntity);
+        return ProductMapper.toDomain(savedEntity);
     }
 
     /**
