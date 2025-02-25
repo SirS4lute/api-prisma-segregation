@@ -98,12 +98,118 @@ http://localhost:3000/api/docs
 
 ---
 
+## 💡 Explaining the Architecture
+Our goal is to build a decoupled architecture between business models and database models. To achieve this, we use an additional abstraction layer, ensuring segregation between the application domain and data persistence. This strategy is based on the SOLID principle known as the Interface Segregation Principle (ISP). Some concepts covered here can be better illustrated in: [SOLID-Principles](https://github.com/SirS4lute/SOLID-Principles).
+
+## 🔍 Application of the Interface Segregation Principle (ISP)
+The project structure ensures that our modules, controllers, and services do not depend directly on a specific ORM. This is achieved by creating repository interfaces inside `src/modules/{module}/interfaces/`, defining a contract that any repository implementation (whether Prisma or TypeORM) must follow.
+
+Practical Example:
+- The `products-repository.interface.ts` inside `src/modules/products/interfaces/` defines the operations that a product repository must have.
+- The `products.service.ts` service does not know which ORM is being used because it depends only on the interface.
+- During dependency injection, the Prisma or TypeORM repository is dynamically instantiated based on the `.env` configuration.
+
+This approach allows us to switch between ORMs without affecting the business logic, making the application more flexible and decoupled.
+
+## 📌 Other Applied SOLID Principles
+### 1️⃣ Dependency Inversion Principle (DIP)
+DIP states that high-level modules should not depend directly on low-level modules but on abstractions.
+
+How do we apply this concept?
+- The `products.service.ts` and `categories.service.ts` do not depend directly on Prisma or TypeORM.
+- Instead, they depend on an interface (`products-repository.interface.ts` and `categories-repository.interface.ts`).
+- This means that if we want to add a new ORM in the future (such as Sequelize), we only need to create a new implementation that follows the existing interface without changing the services.
+
+This is reflected in the directory structure:
+```bash
+│   ├── modules/
+│   │   ├── products/
+│   │   │   ├── interfaces/
+│   │   │   │   ├── products-repository.interface.ts  # Defines repository rules
+│   │   │   ├── products.service.ts                   # Service implementation, decoupled from ORM
+```
+
+## 2️⃣ Single Responsibility Principle (SRP)
+Each class or module has a single responsibility.
+
+How do we apply this?
+- The repositories (`products.repository.ts`, `categories.repository.ts`) handle only data persistence.
+- The services (`products.service.ts`, `categories.service.ts`) contain only business logic and application rules.
+- The controllers (`products.controller.ts`, `categories.controller.ts`) are responsible only for receiving requests and calling the appropriate services.
+
+This separation of responsibilities makes the application more organized and easier to maintain.
+
+## 📌 How the Directory Structure Reflects These Principles
+### 1️⃣ Module Separation (SRP)
+Each functionality has its own module, ensuring cohesion and modularity:
+```bash
+│   ├── modules/
+│   │   ├── products/
+│   │   │   ├── dto/                 # Data transfer object definitions
+│   │   │   ├── interfaces/           # Repository contracts
+│   │   │   ├── products.controller.ts
+│   │   │   ├── products.module.ts
+│   │   │   ├── products.service.ts
+│   │   ├── categories/
+```
+
+### 2️⃣ Abstraction Layer for Repositories (DIP and ISP)
+We create an additional layer for ORMs, isolating them from the core application.
+```bash
+│   ├── repositories/
+│   │   ├── prisma/                   # Prisma Implementation
+│   │   │   ├── products.repository.ts
+│   │   │   ├── categories.repository.ts
+│   │   ├── typeOrm/                   # TypeORM Implementation
+│   │   │   ├── products/
+│   │   │   │   ├── product.entity.ts    # TypeORM Entity
+│   │   │   │   ├── product.mapper.ts    # Mapper for conversion
+│   │   │   │   ├── product.repository.ts
+│   │   │   ├── categories/
+│   │   │   │   ├── category.entity.ts
+│   │   │   │   ├── category.mapper.ts
+│   │   │   │   ├── category.repository.ts
+```
+
+### 3️⃣ Dynamic ORM Configuration
+The ORM initialization happens according to the `.env` configuration, ensuring flexibility.
+The mapper layer (`product.mapper.ts` and `category.mapper.ts`) helps maintain the separation between database entities and business models, following SRP principles.
+```bash
+│── .env                 # Defines which ORM will be used
+│── typeOrm/
+│   ├── data-source.ts    # TypeORM Configuration
+```
+
+In `main.ts`, we check the `DATABASE_ORM` variable and dynamically initialize the correct ORM:
+
+```bash
+if (process.env.DATABASE_ORM == 'typeOrm') {
+  // Inicializa o banco de dados typeORM
+  await initializeDatabase();
+}
+```
+
+In `products.module.ts`, we exemplify how the choice of ORM is injected into the service, using an interface to maintain decoupling:
+
+```bash
+providers: [
+    ProductsService, 
+    { 
+      provide: 'ProductsRepository', 
+      useClass: process.env.DATABASE_ORM == 'typeOrm' ? 
+        TypeORMProductsRepository : PrismaProductsRepository
+    }
+  ],
+```
+
 ## 📌 Final Considerations
-This project was structured to allow easy maintenance and scalability. The separation between ORMs avoids database coupling, making it possible to adapt to new technologies in the future. 🚀
+This project was structured to be scalable, modular, and flexible, applying essential SOLID concepts to ensure a robust architecture.
+- Prisma and TypeORM are completely decoupled from the core application.
+- ORM switching is done simply by editing the `.env` file.
+- Services and controllers are not affected by the ORM choice.
+- The architecture facilitates application evolution, allowing new ORMs to be added in the future without rewriting the entire business logic.
 
-If you have questions, suggestions, or improvements, feel free to contribute to the project! 😊
-
-
+If you have any questions or suggestions, feel free to contribute! 🚀
 
 # API de Produtos - NestJS [PT-BR]
 
@@ -313,7 +419,7 @@ providers: [
   ],
 ```
 
-## Arquitetura completa
+## Estrutura de diretórios completa
 
 ```bash
 api-prisma-segregation/
