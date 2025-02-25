@@ -2,7 +2,7 @@
 - [Product API - NestJS [PT-BR]](#pt-br)
 - [Estrutura de diretórios completa / Full directories structrure](#dir)
 
-# Products API: Example of a decoupled structure - NestJS [EN]
+# Products API: Example of a decoupled structure - NestJS [EN-US]
 
 This project was developed using NestJS, following best architectural practices and ensuring segregation between the Prisma and TypeORM ORMs. The goal is to provide a robust API for managing products and categories, allowing seamless switching between ORMs via configuration. My objective here is just to show a decoupled structure.
 
