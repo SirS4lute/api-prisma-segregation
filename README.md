@@ -1,3 +1,7 @@
+# Atalho / Shortcut
+- [Product API - NestJS [PT-BR]](#pt-br)
+- [Estrutura de diretórios completa / Full directories structrure](#dir)
+
 # Product API - NestJS [EN]
 
 This project was developed using NestJS, following best architectural practices and ensuring segregation between the Prisma and TypeORM ORMs. The goal is to provide a robust API for managing products and categories, allowing seamless switching between ORMs via configuration.
@@ -32,6 +36,7 @@ DATABASE_URL='file:./dev.db'
 ```
 
 ### 4️⃣ Run Migrations (Using Prisma)
+**Attention**: In this project, you can use either Prisma or TypeORM, but you must initialize the project with Prisma first, as the migrations were created exclusively with Prisma. Feel free to create TypeORM migrations!
 ```bash
 npx prisma migrate dev
 ```
@@ -213,7 +218,7 @@ If you have any questions or suggestions, feel free to contribute! 🚀
 
 ---
 
-# API de Produtos - NestJS [PT-BR]
+# API de Produtos - NestJS [PT-BR] <a name="pt-br"></a>
 
 Este projeto foi desenvolvido utilizando o **NestJS**, seguindo boas práticas de arquitetura e garantindo a segregação entre os ORMs **Prisma** e **TypeORM**. O objetivo é proporcionar uma API robusta para gerenciar produtos e categorias, permitindo alternar entre os ORMs via configuração.
 
@@ -247,6 +252,7 @@ DATABASE_URL='file:./dev.db'
 ```
 
 ### 4️⃣ Executar as Migrações (Usando Prisma)
+**Atenção**: Neste projeto, você pode usar ambos Prisma ou TypeORM, mas você precisa inicializar o projeto com Prisma primeiro, já que as migrations foram criadas exclusivamente com Prisma. Sinta-se livre para criar migrations do TypeORM!
 ```bash
 npx prisma migrate dev
 ```
@@ -429,7 +435,7 @@ Caso tenha dúvidas ou sugestões, sinta-se à vontade para contribuir! 🚀
 
 ---
 
-## Estrutura de diretórios completa / Full directories structrure
+## Estrutura de diretórios completa / Full directories structrure <a name="dir"></a>
 
 ```bash
 api-prisma-segregation/
