@@ -25,9 +25,9 @@ npm install
 ```
 
 ### 3️⃣ Configure the Environment
-Renomeie o arquivo `.env.example` para `.env` e defina as configurações necessárias:
+Rename the `.env.example` file to `.env` and set the necessary configurations:
 ```ini
-DATABASE_ORM=prisma # ou typeOrm
+DATABASE_ORM=prisma # or typeOrm
 DATABASE_URL='file:./dev.db'
 ```
 
