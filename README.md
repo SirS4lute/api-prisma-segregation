@@ -1,4 +1,111 @@
-# API de Produtos - NestJS
+# API de Produtos - NestJS [EN]
+
+This project was developed using NestJS, following best architectural practices and ensuring segregation between the Prisma and TypeORM ORMs. The goal is to provide a robust API for managing products and categories, allowing seamless switching between ORMs via configuration.
+
+## 🛠️ Technologies Used
+- **NestJS**
+- **Prisma ORM**
+- **TypeORM**
+- **SQLite** (Database used for development)
+- **Swagger** (API Documentation)
+
+---
+
+## 🚀 How to Initialize the Project
+
+### 1️⃣ Clone the Repository
+```bash
+ git clone <URL_DO_REPOSITORIO>
+ cd api-prisma-segregation
+```
+
+### 2️⃣ Install Dependencies
+```bash
+npm install
+```
+
+### 3️⃣ Configure the Environment
+Renomeie o arquivo `.env.example` para `.env` e defina as configurações necessárias:
+```ini
+DATABASE_ORM=prisma # ou typeOrm
+DATABASE_URL='file:./dev.db'
+```
+
+### 4️⃣ Run Migrations (Using Prisma)
+```bash
+npx prisma migrate dev
+```
+
+### 5️⃣ Start the Server
+```bash
+npm run start:dev
+```
+The server will be available at: `http://localhost:3000`
+
+---
+
+## 🔀 Switching Between Prisma and TypeORM
+
+The project allows switching between ORMs without impacting the application core. To do this, simply modify the `DATABASE_ORM` variable in the `.env` file:
+
+- **To use Prisma:**
+  ```ini
+  DATABASE_ORM=prisma
+  ```
+  - Prisma will be initialized automatically.
+  - Make sure to run `npx prisma migrate dev` to create the database.
+
+- **To use TypeORM:**
+  ```ini
+  DATABASE_ORM=typeOrm
+  ```
+  - TypeORM will be initialized automatically.
+  - Ensure that the entities are correctly configured in `data-source.ts`.
+
+---
+
+## 📜 API Documentation
+The interactive API documentation can be accessed via Swagger at:
+```bash
+http://localhost:3000/api/docs
+```
+
+### 📌 Main Endpoints
+
+#### 🔹 Products
+- **`GET /products`** → List all products
+- **`GET /products/:id`** → Get a product by ID
+- **`POST /products`** → Create a new product
+  ```json
+  {
+    "name": "Keyboard",
+    "price": 100,
+    "categoryId": 1
+  }
+  ```
+- **`PUT /products/:id`** → Update an existing product
+  ```json
+  {
+    "name": "Mechanical Keyboard",
+    "price": 200,
+    "categoryId": 1
+  }
+  ```
+- **`DELETE /products/:id`** → Delete a product by ID
+
+#### 🔹 Categorias
+- **`GET /categories`** → List all categories
+
+---
+
+## 📌 Final Considerations
+This project was structured to allow easy maintenance and scalability. The separation between ORMs avoids database coupling, making it possible to adapt to new technologies in the future. 🚀
+
+If you have questions, suggestions, or improvements, feel free to contribute to the project! 😊
+
+
+
+# API de Produtos - NestJS [PT-BR]
 
 Este projeto foi desenvolvido utilizando o **NestJS**, seguindo boas práticas de arquitetura e garantindo a segregação entre os ORMs **Prisma** e **TypeORM**. O objetivo é proporcionar uma API robusta para gerenciar produtos e categorias, permitindo alternar entre os ORMs via configuração.
 
