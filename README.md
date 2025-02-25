@@ -1,4 +1,4 @@
-# Atalho / Shortcut
+# Atalhos / Shortcuts
 - [Product API - NestJS [PT-BR]](#pt-br)
 - [Estrutura de diretórios completa / Full directories structrure](#dir)
 
