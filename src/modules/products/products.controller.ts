@@ -2,6 +2,7 @@ import { Controller, Get, Post, Put, Delete, Body, Param } from '@nestjs/common'
 import { ProductsService } from './products.service';
 import { Product } from '../../core/models/product.model';
 import { CreateProductDto } from './dtos/create-product.dto';
+import { UpdateProductDto } from './dtos/update-product.dto';
 
 @Controller('products')
 export class ProductsController {
@@ -9,10 +10,11 @@ export class ProductsController {
 
   @Post()
   create(@Body() productRequest: CreateProductDto) {
-    const product = Product.createFrom(
-      productRequest
+    return this.productsService.create(
+      Product.createFrom(
+        productRequest
+      )
     );
-    return this.productsService.create(product);
   }
 
   @Get()
@@ -26,8 +28,13 @@ export class ProductsController {
   }
 
   @Put(':id')
-  update(@Param('id') id: number, @Body() product: Partial<Product>) {
-    return this.productsService.update(id, product);
+  update(@Param('id') id: number, @Body() productRequest: UpdateProductDto) {
+    return this.productsService.update(
+      id, 
+      Product.createFrom(
+        productRequest
+      )
+    );
   }
 
   @Delete(':id')

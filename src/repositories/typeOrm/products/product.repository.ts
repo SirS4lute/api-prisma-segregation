@@ -9,7 +9,6 @@ export class TypeORMProductsRepository implements ProductsRepository {
     private repository: Repository<ProductEntity>;
 
     constructor() {
-        // Inicializa o repositório do TypeORM
         this.repository = AppDataSource.getRepository(ProductEntity);
     }
 
@@ -26,8 +25,8 @@ export class TypeORMProductsRepository implements ProductsRepository {
      * Retorna todos os produtos, incluindo a categoria relacionada.
      */
     async findAll(): Promise<Product[]> {
-        const productEntities = await this.repository.find({ relations: ['category'] }); // Carrega a relação com Category
-        return productEntities.map(ProductMapper.toDomain); // Converte cada entidade para domínio
+        const productEntities = await this.repository.find({ relations: ['category'] });
+        return productEntities.map(ProductMapper.toDomain);
     }
 
     /**
@@ -36,29 +35,29 @@ export class TypeORMProductsRepository implements ProductsRepository {
     async findById(id: number): Promise<Product | null> {
         const productEntity = await this.repository.findOne({
             where: { id },
-            relations: ['category'], // Carrega a relação com Category
+            relations: ['category'],
         });
         if (!productEntity) return null;
-        return ProductMapper.toDomain(productEntity); // Converte para domínio
+        return ProductMapper.toDomain(productEntity);
     }
 
     /**
      * Atualiza um produto existente.
      */
     async update(id: number, product: Partial<Product>): Promise<Product> {
-        await this.repository.update(id, ProductMapper.toEntity(product as Product)); // Atualiza no banco
+        await this.repository.update(id, ProductMapper.toEntity(product as Product));
         const updatedEntity = await this.repository.findOne({
             where: { id },
-            relations: ['category'], // Carrega a relação com Category
+            relations: ['category'],
         });
         if (!updatedEntity) throw new Error('Product not found');
-        return ProductMapper.toDomain(updatedEntity); // Converte para domínio
+        return ProductMapper.toDomain(updatedEntity);
     }
 
     /**
      * Remove um produto pelo ID.
      */
     async delete(id: number): Promise<void> {
-        await this.repository.delete(id); // Remove do banco
+        await this.repository.delete(id);
     }
 }

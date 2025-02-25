@@ -1,8 +1,8 @@
-import { Category } from 'src/core/models/category.model'; // Entidade de domínio
-import { CategoryEntity } from './category.entity'; // Entidade do TypeORM
-import { Product } from 'src/core/models/product.model'; // Entidade de domínio Product
-import { ProductEntity } from '../products/product.entity'; // Entidade do TypeORM Product
-import { ProductMapper } from '../products/product.mapper'; // Mapper de Product
+import { Category } from 'src/core/models/category.model';
+import { CategoryEntity } from './category.entity';
+import { Product } from 'src/core/models/product.model';
+import { ProductEntity } from '../products/product.entity';
+import { ProductMapper } from '../products/product.mapper';
 
 export class CategoryMapper {
     /**
@@ -10,7 +10,6 @@ export class CategoryMapper {
      * Inclui a conversão dos produtos relacionados, se existirem.
      */
     public static toDomain(entity: CategoryEntity): Category {
-        // Converte os produtos relacionados (se existirem)
         const products: Product[] = entity.products
             ? entity.products.map(ProductMapper.toDomain)
             : [];
@@ -18,7 +17,7 @@ export class CategoryMapper {
         return Category.createFrom({
             id: entity.id,
             name: entity.name,
-            products: products, // Adiciona os produtos convertidos
+            products: products,
         });
     }
 
@@ -31,7 +30,6 @@ export class CategoryMapper {
         entity.id = domain.id;
         entity.name = domain.name;
 
-        // Converte os produtos relacionados (se existirem)
         if (domain.products) {
             entity.products = domain.products.map(ProductMapper.toEntity);
         }

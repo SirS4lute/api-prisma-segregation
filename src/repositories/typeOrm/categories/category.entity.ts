@@ -1,14 +1,14 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import { ProductEntity } from '../products/product.entity';
 
-@Entity('Category') // Nome da tabela no banco de dados
+@Entity('Category')
 export class CategoryEntity {
-    @PrimaryGeneratedColumn() // Coluna de ID gerada automaticamente
+    @PrimaryGeneratedColumn()
     id?: number;
 
-    @Column({ type: 'varchar', length: 255 }) // Coluna para o nome da categoria
+    @Column({ type: 'varchar', length: 255 })
     name: string;
 
-    @OneToMany(() => ProductEntity, (product) => product.category) // Relacionamento um-para-muitos
-    products?: ProductEntity[]; // Lista de produtos associados à categoria
+    @OneToMany(() => ProductEntity, (product) => product.category)
+    products?: ProductEntity[];
 }

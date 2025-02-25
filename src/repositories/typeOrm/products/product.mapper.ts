@@ -1,6 +1,6 @@
-import { Product } from 'src/core/models/product.model'; // Entidade de domínio
-import { ProductEntity } from './product.entity'; // Entidade do TypeORM
-import { CategoryMapper } from '../categories/category.mapper'; // Supondo que você tenha um mapper para Category
+import { Product } from 'src/core/models/product.model';
+import { ProductEntity } from './product.entity';
+import { CategoryMapper } from '../categories/category.mapper';
 
 export class ProductMapper {
     /**
@@ -12,7 +12,7 @@ export class ProductMapper {
             name: entity.name,
             categoryId: entity.categoryId,
             price: entity.price,
-            category: entity.category ? CategoryMapper.toDomain(entity.category) : undefined, // Mapeia a categoria, se existir
+            category: entity.category ? CategoryMapper.toDomain(entity.category) : undefined,
         });
     }
 
@@ -25,7 +25,7 @@ export class ProductMapper {
         entity.name = domain.name;
         entity.categoryId = domain.categoryId;
         entity.price = domain.price;
-        entity.category = domain.category ? CategoryMapper.toEntity(domain.category) : undefined; // Mapeia a categoria, se existir
+        entity.category = domain.category ? CategoryMapper.toEntity(domain.category) : undefined;
         return entity;
     }
 }
