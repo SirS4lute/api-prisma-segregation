@@ -1,7 +1,6 @@
 import { Category } from 'src/core/models/category.model';
 import { CategoryEntity } from './category.entity';
 import { Product } from 'src/core/models/product.model';
-import { ProductEntity } from '../products/product.entity';
 import { ProductMapper } from '../products/product.mapper';
 
 export class CategoryMapper {
