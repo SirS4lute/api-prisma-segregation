@@ -205,8 +205,172 @@ http://localhost:3000/api/docs
 
 ---
 
+## 💡 Explicando a arquitetura
+Nosso objetivo é montar uma arquitetura desacoplada entre os modelos de negócio e os modelos de banco de dados. Para isso, utilizamos uma camada adicional de abstração, garantindo a segregação entre o domínio da aplicação e a persistência dos dados. Essa estratégia se baseia no conceito do SOLID conhecido como Interface Segregation Principle (ISP). Alguns conceitos abordados aqui podem ser melhor ilustrados em: [SOLID-Principles](https://github.com/SirS4lute/SOLID-Principles).
+
+## 🔍 Aplicação do Interface Segregation Principle (ISP)
+A estrutura do projeto garante que nossos módulos, controllers e services não dependam diretamente de um ORM específico. Isso é feito através da criação de interfaces de repositórios dentro de src/modules/{modulo}/interfaces/, definindo um contrato que qualquer implementação de repositório (seja Prisma ou TypeORM) deve seguir.
+
+Exemplo prático:
+
+- A interface products-repository.interface.ts dentro de src/modules/products/interfaces/ define as operações que um repositório de produtos deve ter.
+- O serviço products.service.ts não sabe qual ORM está sendo utilizado, pois ele depende apenas da interface.
+- No momento da injeção de dependência, o repositório Prisma ou TypeORM é instanciado dinamicamente, baseado na configuração do .env.
+Essa abordagem nos permite alternar entre os ORMs sem afetar a regra de negócio, tornando a aplicação mais flexível e desacoplada.
+
+## 📌 Outros Princípios do SOLID Aplicados
+### 1️⃣ Dependency Inversion Principle (DIP)
+O DIP preconiza que módulos de alto nível não devem depender de módulos de baixo nível diretamente, mas sim de abstrações.
+
+Como aplicamos esse conceito?
+
+- O products.service.ts e o categories.service.ts não dependem diretamente de Prisma ou TypeORM.
+- Em vez disso, eles dependem de uma interface (products-repository.interface.ts e categories-repository.interface.ts).
+- Isso significa que se quisermos adicionar um novo ORM no futuro (como Sequelize), basta criar uma nova implementação que siga a interface existente, sem alterar os serviços.
+Isso se reflete na estrutura do diretório:
+
+```bash
+│   ├── modules/
+│   │   ├── products/
+│   │   │   ├── interfaces/
+│   │   │   │   ├── products-repository.interface.ts  # Define as regras do repositório
+│   │   │   ├── products.service.ts                   # Implementação do serviço, desacoplado do ORM
+```
+
+## 2️⃣ Single Responsibility Principle (SRP)
+Cada classe ou módulo tem uma única responsabilidade.
+Como aplicamos isso?
+
+- Os repositórios (products.repository.ts, categories.repository.ts) apenas lidam com a persistência de dados.
+- Os serviços (products.service.ts, categories.service.ts) apenas contêm regras de negócio e lógica de aplicação.
+- Os controladores (products.controller.ts, categories.controller.ts) são responsáveis apenas por receber requisições e chamar os serviços apropriados.
+Essa separação de responsabilidades torna a aplicação mais organizada e fácil de manter.
+
+## 📌 Como a Estrutura do Diretório Reflete Esses Princípios
+### 1️⃣ Separação de Módulos (SRP)
+Cada funcionalidade tem seu próprio módulo, garantindo coesão e modularidade:
+
+```bash
+│   ├── modules/
+│   │   ├── products/
+│   │   │   ├── dto/                 # Definição de objetos de transferência de dados
+│   │   │   ├── interfaces/           # Contratos para repositórios
+│   │   │   ├── products.controller.ts
+│   │   │   ├── products.module.ts
+│   │   │   ├── products.service.ts
+│   │   ├── categories/
+```
+
+### 2️⃣ Camada de Abstração para Repositórios (DIP e ISP)
+Criamos uma camada adicional para os ORMs, isolando-os do core da aplicação.
+
+```bash
+│   ├── repositories/
+│   │   ├── prisma/                   # Implementação do Prisma
+│   │   │   ├── products.repository.ts
+│   │   │   ├── categories.repository.ts
+│   │   ├── typeOrm/                   # Implementação do TypeORM
+│   │   │   ├── products/
+│   │   │   │   ├── product.entity.ts    # Entidade do TypeORM
+│   │   │   │   ├── product.mapper.ts    # Mapper para conversão
+│   │   │   │   ├── product.repository.ts
+│   │   │   ├── categories/
+│   │   │   │   ├── category.entity.ts
+│   │   │   │   ├── category.mapper.ts
+│   │   │   │   ├── category.repository.ts
+```
+
+### 3️⃣ Configuração do ORM Dinâmico
+A inicialização do ORM acontece de acordo com a configuração do .env, garantindo flexibilidade.
+
+A camada de mappers (product.mapper.ts e category.mapper.ts) ajuda a manter a separação entre as entidades do banco e os modelos de negócio, seguindo o SRP.
+
+```bash
+│── .env                 # Define qual ORM será utilizado
+│── typeOrm/
+│   ├── data-source.ts    # Configuração do TypeORM
+```
+
+No `main.ts`, verificamos a variável `DATABASE_ORM` e inicializamos dinamicamente o ORM correto:
+
+```bash
+if (process.env.DATABASE_ORM == 'typeOrm') {
+  // Inicializa o banco de dados typeORM
+  await initializeDatabase();
+}
+```
+
+No `products.module.ts` exemplificamos como é feita a escolha de qual ORM será injetado na service, utilizando a interface para manter o desacoplamento
+
+```bash
+providers: [
+    ProductsService, 
+    { 
+      provide: 'ProductsRepository', 
+      useClass: process.env.DATABASE_ORM == 'typeOrm' ? 
+        TypeORMProductsRepository : PrismaProductsRepository
+    }
+  ],
+```
+
+## Arquitetura completa
+
+```bash
+api-prisma-segregation/
+│── node_modules/                                    # Dependências do projeto
+│── prisma/                                          # Diretório do Prisma ORM
+│   ├── migrations/                                  # Migrações do banco de dados
+│   ├── schema.prisma                                # Esquema do Prisma
+│   ├── dev.db                                       # Banco de dados SQLite (usado em desenvolvimento)
+│── src/                                             # Código-fonte principal
+│   ├── modules/                                     # Módulos da aplicação
+│   │   ├── products/                                # Módulo de produtos
+│   │   │   ├── dto/                                 # Data Transfer Objects de produtos
+│   │   │   │   ├── create-product.dto.ts
+│   │   │   │   ├── update-product.dto.ts
+│   │   │   ├── interfaces/                          # Interfaces de produtos
+│   │   │   │   ├── products-repository.interface.ts 
+│   │   │   ├── products.controller.ts
+│   │   │   ├── products.module.ts
+│   │   │   ├── products.service.ts
+│   │   ├── categories/                              # Módulo de categorias
+│   │   │   ├── interfaces/                          # Interfaces de produtos
+│   │   │   ├── categories.controller.ts
+│   │   │   ├── categories.module.ts
+│   │   │   ├── categories.service.ts
+│   ├── repositories/                                # Diretório de repositórios para persistência de dados
+│   │   ├── prisma/                                  # Implementações com Prisma
+│   │   │   ├── categories.repository.ts
+│   │   │   ├── products.repository.ts
+│   │   ├── typeOrm/                                 # Implementações com TypeORM
+│   │   │   ├── categories/
+│   │   │   │   ├── category.entity.ts               # Entidade de categorias
+│   │   │   │   ├── category.mapper.ts               # Mapper entre a entidade de categorias e o modelo de negócios
+│   │   │   │   ├── category.repository.ts           # Repository de categorias utilizando typeOrm
+│   │   │   ├── products/
+│   │   │   │   ├── product.entity.ts                # Entidade de produtos
+│   │   │   │   ├── product.mapper.ts                # Mapper entre a entidade de produtos e o modelo de negócios
+│   │   │   │   ├── product.repository.ts            # Repository de produtos utilizando typeOrm
+│   ├── app.controller.ts                            # Controller principal
+│   ├── app.module.ts                                # Módulo raiz da aplicação
+│   ├── app.service.ts                               # Serviço principal
+│   ├── main.ts                                      # Arquivo de inicialização do NestJS
+│── test/                                            # Testes da aplicação
+│── typeOrm/                                         # Diretório do TypeORM
+│   ├── data-source.ts                               # Configuração do TypeORM
+│── .env                                             # Configurações de ambiente
+│── .gitignore                                       # Arquivos ignorados pelo Git
+│── package.json                                     # Dependências e scripts do projeto
+│── tsconfig.json                                    # Configuração do TypeScript
+...
+```
+
 ## 📌 Considerações Finais
-Este projeto foi estruturado de forma a permitir fácil manutenção e escalabilidade. A separação entre os ORMs evita acoplamento ao banco de dados, tornando possível a adaptação para novas tecnologias no futuro. 🚀
+Este projeto foi estruturado para ser escalável, modular e flexível, aplicando conceitos essenciais do SOLID para garantir uma arquitetura robusta.
 
-Caso tenha dúvidas, sugestões ou melhorias, contribua com o projeto! 😊
+- Prisma e TypeORM estão completamente desacoplados do core da aplicação.
+- A troca de ORM é feita apenas editando o arquivo .env.
+- Os serviços e controladores não são afetados pela escolha do ORM.
+- A arquitetura facilita a evolução da aplicação, permitindo adicionar novos ORMs futuramente sem reescrever toda a lógica de negócio.
 
+Caso tenha dúvidas ou sugestões, sinta-se à vontade para contribuir! 🚀
