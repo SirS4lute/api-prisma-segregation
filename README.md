@@ -1,4 +1,4 @@
-# API de Produtos - NestJS [EN]
+# Product API - NestJS [EN]
 
 This project was developed using NestJS, following best architectural practices and ensuring segregation between the Prisma and TypeORM ORMs. The goal is to provide a robust API for managing products and categories, allowing seamless switching between ORMs via configuration.
 
